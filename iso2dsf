@@ -1,0 +1,26 @@
+#!/bin/bash
+# This script extracts SACD tracks to dsf files 
+echo ""
+echo "Begin of extraction:" $(date)
+echo ""
+StartDate=$(date +%s)
+for file in *.iso; do
+  # print title of SACD
+  echo $(sacd_extract -P -i"$file" | grep -i "Title:" | tail -1 | sed 's|Title|Title of SACD-R|g')
+  # number of tracks in SACD
+  NumberOfTracks=$(sacd_extract -P -i"$file" | grep -i "Track count" | awk '{ print $3 }' | tail -1)
+  echo "Number of tracks in the SACD: $NumberOfTracks"
+  echo ""
+  echo "Extracting…"
+  echo ""
+  # extract two channels Sony dsf files (DST) to folder "artist - title" contained in the SACD
+  sacd_extract -2 -s -c -i"$file"
+  echo ""
+done
+echo ""
+FinalDate=$(date +%s)
+echo ""
+echo "End of extraction:" $(date)
+echo ""
+echo Time of extraction: $(date -u -d "0 $FinalDate seconds - $StartDate seconds" +"%H:%M:%S")
+echo ""
